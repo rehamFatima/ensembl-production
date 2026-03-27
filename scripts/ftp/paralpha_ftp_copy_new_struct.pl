@@ -54,8 +54,7 @@ sub assembly_split {
   my @substrs = split(/\_/,$asm);  
   my @version = split(/\./,$substrs[1]);
   
-  # reduce the length of the string by the version - version ghaat deyo 
-  
+  # reduce the length of the string by the version
   my @sub_dirs = ();
   
   for (my $begin = 0; $begin <= length($substrs[1]) - ($subdir_len + length($version[1])); $begin += $subdir_len ) {
