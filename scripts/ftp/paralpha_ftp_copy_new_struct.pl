@@ -73,7 +73,6 @@ sub make_dirs_for_asm {
   opendir my $dir, $og_ftp_path or die "Cannot open directory: $!";
   my @specie_files = readdir $dir;
   closedir $dir;
-  # print scalar @specie_files;
   my $counter = 0;
   my @annotation_sets = ('ensembl','refseq','flybase','community'); # ,'genbank','wormbase'
   my @community_annotation_sets = ('Salk', 'JGI', 'CGD', 'cnag');
@@ -93,7 +92,6 @@ sub make_dirs_for_asm {
     foreach my $assembly (@assemblies){
       # next unless $assembly =~ /011100615.1/; 
       my @split_asm = assembly_split($assembly);
-      # print "split_asm $split_asm[0]\n";
       $dir = "";
       foreach my $asd (@split_asm){
         $dir = catdir($dir, $asd);
@@ -179,7 +177,6 @@ sub make_dirs_for_asm {
           closedir $dir_aa;
         }
         elsif ( $an_asm eq 'genome') {
-          # write elsif.s for genome, vep
           print "genome \n";
           foreach my $date (@dates){
             dircopy("$og_ftp_path$specie/$assembly/$an_asm",
@@ -189,7 +186,6 @@ sub make_dirs_for_asm {
         }      
 
         elsif ( $an_asm eq 'vep') {
-          # write elsif.s for genome, vep
           opendir my $dir_vep, "$og_ftp_path$specie/$assembly/$an_asm/";
           my @vep_dirs = readdir $dir_vep;
           shift (@vep_dirs); # .
@@ -221,14 +217,12 @@ sub make_dirs_for_asm {
   }
 }
 
-
 sub gz_to_bgz {
   
   # my $h_path = shift ();
   my $dest_path = shift ();
   my $specie = shift ();
   my $assembly = shift ();
-  # print "dest path : $dest_path\n";
   opendir my $dir, $dest_path or print LOG "$specie\t$assembly\t Cannot open directory: $! $dest_path\n" and return;
   my @files = readdir $dir;
   closedir $dir;
@@ -251,7 +245,7 @@ sub gz_to_bgz {
     }
 
     if(index ($f, ".gz") != -1){
-      # extract filename - .gz
+      # extract filename minus .gz
       gunzip ("$dest_path$f", $dest_path.(substr ($f, 0, -3 ))) or print LOG "gunzip failed: $GunzipError\n";
 
       bzip2 "$dest_path".substr ($f, 0, -3 ), "$dest_path".substr ($f, 0, -3 ).".bgz"
@@ -300,7 +294,3 @@ sub date_for_homology {
   }
 
 }
-
-# if( grep $_ eq ($an_asm), @community_annotation_sets ){
-#   $an_asm = 'community';
-# }
