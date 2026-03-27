@@ -1,3 +1,18 @@
+#!/usr/bin/env perl
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016-2025] EMBL-European Bioinformatics Institute
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
 
 use warnings;
 use Getopt::Long;
@@ -22,7 +37,6 @@ GetOptions(
   'alpha=s' => \$alpha
 );
 
-# use File::Util::Rename
 my $log_file = '>/hps/software/users/ensembl/production/ens2020/modenv/production/ftpdumps_new_structure114/copy_overs/uncharted_'.$alpha.'_03.log';
 open LOG, $log_file;
 
@@ -37,12 +51,8 @@ sub assembly_split {
   my $asm = shift();
   my $subdir_len = 3;
   
-  my @substrs = split(/\_/,$asm);
-  # print $substrs[1]."\n";
-  # _ part
-  # . part
+  my @substrs = split(/\_/,$asm);  
   my @version = split(/\./,$substrs[1]);
-  # print length($version[1])."\t ver $version[1]\n";
   
   # reduce the length of the string by the version - version ghaat deyo 
   
@@ -88,7 +98,6 @@ sub make_dirs_for_asm {
       $dir = "";
       foreach my $asd (@split_asm){
         $dir = catdir($dir, $asd);
-        # print "as split $asd\ndir: $dir\n ";
       }
       
       
@@ -96,21 +105,17 @@ sub make_dirs_for_asm {
       my @anno_asms = readdir $dir_asm;
       shift (@anno_asms); # .
       shift (@anno_asms); # ..
-      # make_path("/hps/software/users/ensembl/production/ens2020/modenv/production/ftpdumps_new_structure114/copy_overs".$dir);
-      # dircopy("/hps/nobackup/flicek/ensembl/production/ensembl_dumps/ftp_mvp/organisms/$specie/$assembly/", "/hps/software/users/ensembl/production/ens2020/modenv/production/ftpdumps_new_structure114/copy_overs/time_test".$dir."/");
       my @dates = ();
       my $asm_src = '';
-      my $copy_path = '/hps/nobackup/flicek/ensembl/production/ensembl_dumps/ftp_new_structure'; #"/hps/software/users/ensembl/production/ens2020/modenv/production/ftpdumps_new_structure114/copy_overs/zippie";
+      my $copy_path = '/hps/nobackup/flicek/ensembl/production/ensembl_dumps/ftp_new_structure'; 
       
-      # if (-d $copy_path.$dir) {
-      #   print "$copy_path$dir filepath exists, skipping $specie $assembly \n";
-      #   next;
-      # }
+      if (-d $copy_path.$dir) {
+        print "$copy_path$dir filepath exists, skipping $specie $assembly \n";
+        next;
+      }
       foreach my $an_asm (@anno_asms){
         
-        print "anno asm : $an_asm\n";
-
-        
+        print "anno asm : $an_asm\n";        
         if ( !((grep $_ eq ($an_asm), @community_annotation_sets) || (grep $_ eq ($an_asm), @annotation_sets) || $an_asm eq 'genome' || $an_asm eq 'vep' )){
           print LOG "Unknown annotation source : $an_asm for $specie assembly $assembly\n"; 
         }
@@ -132,26 +137,11 @@ sub make_dirs_for_asm {
             @dates = readdir $dir_date;
             shift (@dates); # .
             shift (@dates);
-            # foreach my $date (@dates){
-              # check for format correction 
-              # ...
-              
-              # print "/hps/software/users/ensembl/production/ens2020/modenv/production/ftpdumps_new_structure114/copy_overs".$dir."/$an_asm/$date/$genetic_folders[0]\n";
-              # make_path("/hps/software/users/ensembl/production/ens2020/modenv/production/ftpdumps_new_structure114/copy_overs".$dir."/$an_asm/$date/$genetic_folders[0]");
-            
-            # }
-          
-          }
-          else{
-            # print to file the new asm/anno
-            # ...
           }
           
           foreach my $g_folder (@genetic_folders){
-            # print "dir gen :$g_folder/\n"; #  $og_ftp_path$specie/$assembly/$an_asm/
             opendir my $dir_gen, "$og_ftp_path$specie/$assembly/$an_asm/$g_folder/" or print LOG "$specie\t$assembly\tCannot open directory: $!";
             foreach my $date (@dates){
-              # print ("/hps/software/users/ensembl/production/ens2020/modenv/production/ftpdumps_new_structure114/copy_overs".$dir."/$an_asm/$date/$g_folder\n");
               make_path($copy_path.$dir."/$an_asm/$date/$g_folder");
               if ($g_folder eq 'geneset'){
 
@@ -170,8 +160,6 @@ sub make_dirs_for_asm {
                 shift (@files);
                 foreach my $file (@files){
                   if ($file =~ $homo){
-                    # print "host homo : $copy_path".$dir."/$asm_src/$date/$g_folder/$file\n";
-                    # print "dest homo : $copy_path".$dir."/$asm_src/$date/$g_folder/homology.tsv.gz\n";
                     my $homo_date = date_for_homology($assembly);
                     make_path($copy_path.$dir."/$asm_src/$date/$g_folder/$homo_date");
                     move($copy_path.$dir."/$asm_src/$date/$g_folder/$file",
@@ -195,7 +183,6 @@ sub make_dirs_for_asm {
           # write elsif.s for genome, vep
           print "genome \n";
           foreach my $date (@dates){
-            # make_path("/hps/software/users/ensembl/production/ens2020/modenv/production/ftpdumps_new_structure114/copy_overs".$dir"/ensembl/$date/$an_asm");
             dircopy("$og_ftp_path$specie/$assembly/$an_asm",
                     $copy_path.$dir."/$asm_src/$date/$an_asm/");
             gz_to_bgz($copy_path.$dir."/$asm_src/$date/$an_asm/", $specie, $assembly);
@@ -232,11 +219,7 @@ sub make_dirs_for_asm {
       }
       closedir $dir_asm;
     }
-    # maybe test run with a counter ctrl ?
-    # $counter++;
-    # if($counter>2){last;}
   }
-
 }
 
 
@@ -262,7 +245,6 @@ sub gz_to_bgz {
 
       print "nonsense extension file : $f\nSubtr: ".$dest_path.substr ($f, 0, -3 )."\n";
       rename $dest_path.$f, $dest_path.substr ($f, 0, -3 );
-      # remove ($dest_path.$f);
       next;
     }
     if (index ($f, "tsv") != -1 || index ($f, "xref") != -1 || index ($f, "chain") != -1 || index ($f, "bgz") != -1 || index ($f, "txt") != -1) { # || index ($f, "csi") != -1 || index ($f, "fai") != -1
@@ -271,13 +253,10 @@ sub gz_to_bgz {
 
     if(index ($f, ".gz") != -1){
       # extract filename - .gz
-      # print substr ($f, 0, -3 )."\n";
       gunzip ("$dest_path$f", $dest_path.(substr ($f, 0, -3 ))) or print LOG "gunzip failed: $GunzipError\n";
 
       bzip2 "$dest_path".substr ($f, 0, -3 ), "$dest_path".substr ($f, 0, -3 ).".bgz"
             or print LOG "$specie\t$assembly\tbzip2 failed: $Bzip2Error\n";
-
-      # print "$f\n";
       if(index ($f, "gff") == -1 || index ($f, "gtf") == -1){
         remove ($dest_path.$f);        
       }
