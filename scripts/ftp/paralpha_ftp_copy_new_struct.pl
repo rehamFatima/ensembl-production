@@ -257,7 +257,7 @@ sub gz_to_bgz {
 
       bzip2 "$dest_path".substr ($f, 0, -3 ), "$dest_path".substr ($f, 0, -3 ).".bgz"
             or print LOG "$specie\t$assembly\tbzip2 failed: $Bzip2Error\n";
-      if(index ($f, "gff") == -1 || index ($f, "gtf") == -1){
+      if(index ($f, "gff") == -1 && index ($f, "gtf") == -1){
         remove ($dest_path.$f);        
       }
       remove ($dest_path.substr ($f, 0, -3 ));
