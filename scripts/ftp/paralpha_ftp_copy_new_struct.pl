@@ -31,7 +31,7 @@ use Bio::EnsEMBL::Variation::DBSQL::DBAdaptor;
 use Getopt::Long qw(:config no_ignore_case);
 use Bio::EnsEMBL::Utils::Exception qw(throw);
 
-my $alpha = 'hum';
+my $alpha = 'H';
 
 GetOptions(
   'alpha=s' => \$alpha
@@ -82,7 +82,7 @@ sub make_dirs_for_asm {
   shift (@specie_files); # .
   shift (@specie_files); # ..
   foreach my $specie (@specie_files){
-    next unless $specie =~ /Macaca_fascicularis/; #  /$alpha/ || $specie =~ /H/ || $specie =~ /D/ || $specie =~ /E/ || $specie =~ /B/ #  Homo_sapiens Mus_musculus   $specie =~ // || Megalobrama_amblycephala  Eragrostis_tef 
+    next unless $specie =~ /$alpha/;
     opendir my $dir, "$og_ftp_path$specie" or print LOG "$specie\tCannot open directory: $!";
 
     print "\nspecie : $specie\n";
@@ -92,7 +92,7 @@ sub make_dirs_for_asm {
     shift (@assemblies); # .
     shift (@assemblies); # ..
     foreach my $assembly (@assemblies){
-      next unless $assembly =~ /011100615.1/; # $assembly =~ /000001405/ || GCA_024500355
+      # next unless $assembly =~ /011100615.1/; 
       my @split_asm = assembly_split($assembly);
       # print "split_asm $split_asm[0]\n";
       $dir = "";
